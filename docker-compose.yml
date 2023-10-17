@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  api:
+    env_file:
+      - .env
+    build: apps/api/
+    ports: 
+      - 8000:8000
+    networks:
+      - deploy_network
+    container_name: api
+
+  client:
+    env_file:
+      - .env
+    build: apps/client/
+    depends_on:
+      - api
+    ports: 
+        - 8501:8501
+    networks:
+      - deploy_network
+    container_name: client
+
+networks:
+  deploy_network:
+    driver: bridge
