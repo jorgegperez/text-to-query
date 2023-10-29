@@ -4,13 +4,12 @@ import re
 import pymongo
 from chains import collection_extraction_chain, get_collections_schemas, aggregation_chain
 from dotenv import load_dotenv
-from fastapi import FastAPI
-from uvicorn import run
+from flask import Flask, request
 from bson import json_util
 from utils import utils
 
 
-app = FastAPI()
+app = Flask(__name__)
 
 
 def init_db():
@@ -21,12 +20,14 @@ def init_db():
     return client["test"]
 
 
-@app.get("/")
-async def root(query: str):
+@app.route("/", methods=["GET"])
+def root():
+    args = request.args
+    query = args["query"] if "query" in args else ""
     database = init_db()
     collections = collection_extraction_chain.run(
         collection_names=database.list_collection_names(),
-        query=query
+        query=query,
     )
     schemas = get_collections_schemas(collections, database)
     aggregation_str = aggregation_chain.run(schemas=schemas, query=query)
@@ -51,4 +52,4 @@ async def root(query: str):
 
 if __name__ == "__main__":
     load_dotenv()
-    run(app, host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0", port=8000)

@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 from styles import css, bot_template
 
-API_URL = "http://localhost:8000"
+API_URL = "http://192.168.1.38:5000/"
 
 
 def genetateLlmResponse(query: str):
